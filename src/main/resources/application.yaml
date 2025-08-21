@@ -1,0 +1,19 @@
+spring:
+  application:
+    name: springstore
+  datasource:
+    url: jdbc:mysql://localhost:3306/springstore?createDatabaseIfNotExist=yes
+    username: root
+    password: MyPassword
+
+stripe:
+  apiUrl: https://api.stripe.com
+  enabled: true
+  timeout: 10
+  currencies: USD,EUR,ETB,GBP
+
+payment-gateway: stripe
+messaging-service: sms
+mail:
+  host: https://smtp.gmail.com
+  port: 25
