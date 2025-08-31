@@ -1,22 +1,23 @@
 package com.marakicode.springstore;
 
+import java.math.BigDecimal;
+
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.context.ApplicationContext;
+
 import com.marakicode.springstore.entities.Address;
 import com.marakicode.springstore.entities.Category;
 import com.marakicode.springstore.entities.Product;
 import com.marakicode.springstore.entities.Profile;
 import com.marakicode.springstore.entities.Tag;
 import com.marakicode.springstore.entities.User;
-import org.springframework.boot.SpringApplication;
-import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.context.ApplicationContext;
-
-import java.math.BigDecimal;
 
 @SpringBootApplication
 public class SpringstoreApplication {
 
     public static void main(String[] args) {
-//        ApplicationContext context = SpringApplication.run(SpringstoreApplication.class, args);
+        ApplicationContext context = SpringApplication.run(SpringstoreApplication.class, args);
 
         var user = User.builder()
                 .id(1L)
@@ -58,12 +59,10 @@ public class SpringstoreApplication {
                 .build();
         var product = Product.builder()
                 .id(1L)
-                .title("Product1")
-                .description("Description1")
+                .name("Product1")
                 .price(BigDecimal.valueOf(10))
                 .build();
 
-        category.addProduct(product);
         category.addProduct(product);
         System.out.println(category);
     }
