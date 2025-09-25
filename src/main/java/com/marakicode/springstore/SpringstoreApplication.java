@@ -1,70 +1,52 @@
 package com.marakicode.springstore;
 
-import java.math.BigDecimal;
-
+import com.marakicode.springstore.entities.Category;
+import com.marakicode.springstore.entities.User;
+import com.marakicode.springstore.repositories.CategoryRepository;
+import com.marakicode.springstore.repositories.UserRepository;
+import com.marakicode.springstore.services.UserService;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.ApplicationContext;
-
-import com.marakicode.springstore.entities.Address;
-import com.marakicode.springstore.entities.Category;
-import com.marakicode.springstore.entities.Product;
-import com.marakicode.springstore.entities.Profile;
-import com.marakicode.springstore.entities.Tag;
-import com.marakicode.springstore.entities.User;
 
 @SpringBootApplication
 public class SpringstoreApplication {
 
     public static void main(String[] args) {
         ApplicationContext context = SpringApplication.run(SpringstoreApplication.class, args);
+        var repository = context.getBean(UserRepository.class);
+//        var user = User.builder()
+//                .name("Haile")
+//                .email("Haile@domain.com")
+//                .password("1234")
+//                .build();
+//        repository.save(user);
 
-        var user = User.builder()
-                .id(1L)
-                .name("Maria")
-                .email("maria@domain.com")
-                .password("12314")
-                .build();
-        var address = Address.builder()
-                .id(1L)
-                .street("123 Main St")
-                .city("Addis Ababa")
-                .state("Ababa")
-                .zip("12345")
-                .country("Ethiopia")
-                .build();
+//        repository.findAll()
+//                .forEach(user-> System.out.println(user.getName()));
+//
+//        var user = repository.findById(1L).orElseThrow(()->new RuntimeException("User not found"));
+//        System.out.println(user.getEmail());
 
-        user.addAddress(address);
+//        repository.deleteById(5L);
 
-        var tag = Tag.builder()
-                .id(1L)
-                .name("Tag1")
-                .build();
+        UserService userService = context.getBean(UserService.class);
+//        userService.showEntityStates();
 
-        user.addTag(tag);
-
-        System.out.println(user);
-
-        var profile = Profile.builder()
-                .id(1L)
-                .bio("bio")
-                .phoneNumber("123456789")
-                .loyaltyPoints(1000)
-                .build();
-        user.addProfile(profile);
-        System.out.println(user);
-
-        var category = Category.builder()
-                .name("Category1")
-                .build();
-        var product = Product.builder()
-                .id(1L)
-                .name("Product1")
-                .price(BigDecimal.valueOf(10))
-                .build();
-
-        category.addProduct(product);
-        System.out.println(category);
+//        userService.showRelatedEntities();
+//        userService.fetchAddress();
+//        userService.persistRelated();
+//        userService.deleteRelated();
+//        userService.manageProducts();
+//        userService.updatePrices();
+//        userService.fetchProducts();
+//        userService.callStoreProcedure();
+//        userService.fetchUsers();
+        userService.manageUsers();
+//        var categoryRepository = context.getBean(CategoryRepository.class);
+//        var category = Category.builder()
+//                .name("Category 1")
+//                .build();
+//        categoryRepository.save(category);
     }
-
 }

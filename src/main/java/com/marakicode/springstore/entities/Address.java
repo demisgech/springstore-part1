@@ -1,7 +1,9 @@
 package com.marakicode.springstore.entities;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -47,10 +49,16 @@ public class Address {
    private String country;
 
    @ToString.Exclude
-   @ManyToOne
+   @ManyToOne(
+           fetch = FetchType.LAZY
+   )
    @JoinColumn(
            name = "user_id"
    )
    private User user;
+
+   public Address(Long id) {
+       this.id = id;
+   }
 
 }

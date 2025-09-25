@@ -6,6 +6,9 @@ spring:
     username: root
     password: MyPassword
 
+  jpa:
+    show-sql: true
+
 stripe:
   apiUrl: https://api.stripe.com
   enabled: true
