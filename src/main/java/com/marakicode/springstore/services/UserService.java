@@ -2,17 +2,26 @@ package com.marakicode.springstore.services;
 
 
 import com.marakicode.springstore.entities.Address;
-import com.marakicode.springstore.entities.Category;
+import com.marakicode.springstore.entities.Product;
+import com.marakicode.springstore.entities.Profile;
 import com.marakicode.springstore.entities.User;
 import com.marakicode.springstore.repositories.AddressRepository;
 import com.marakicode.springstore.repositories.CategoryRepository;
 import com.marakicode.springstore.repositories.ProductRepository;
 import com.marakicode.springstore.repositories.ProfileRepository;
 import com.marakicode.springstore.repositories.UserRepository;
+import com.marakicode.springstore.repositories.specifications.ProductSpecification;
+import com.marakicode.springstore.repositories.specifications.ProfileSpecification;
 import jakarta.transaction.Transactional;
 import jakarta.persistence.EntityManager;
 import lombok.AllArgsConstructor;
 
+import org.springframework.data.domain.Example;
+import org.springframework.data.domain.ExampleMatcher;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -61,6 +70,23 @@ public class UserService {
         System.out.println(profile.getUser().getEmail());
     }
 
+    public void fetchProfilesBySpecifications(String bio, Integer minLoyaltyPoints, Integer maxLoyaltyPoints) {
+        Specification<Profile> specification = null;
+        if (bio != null && !bio.isEmpty()) {
+            specification = ProfileSpecification.hasBio(bio);
+        }
+        if (minLoyaltyPoints != null && minLoyaltyPoints > 0) {
+            Specification<Profile> profileSpec = ProfileSpecification.hasLoyaltyPointsGreaterThanOrEqualTo(minLoyaltyPoints);
+            specification = (specification == null) ? profileSpec : specification.and(profileSpec);
+        }
+        if (maxLoyaltyPoints != null && maxLoyaltyPoints > 0) {
+            Specification<Profile> profileSpec = ProfileSpecification.hasLoyaltyPointsLessThanOrEqualTo(maxLoyaltyPoints);
+            specification = (specification == null) ? profileSpec : specification.and(profileSpec);
+        }
+        var profiles = profileRepository.findAll(specification);
+        profiles.forEach(System.out::println);
+    }
+
     @Transactional
     public void fetchAddress() {
 //        var address = addressRepository.findById(5L).orElseThrow();
@@ -75,6 +101,11 @@ public class UserService {
         addresses.forEach(address -> {
             System.out.println(address.getCity());
         });
+    }
+
+    public void fetchAddressByCriteria() {
+        var addresses = addressRepository.findAddressesByCriteria(null, "city", null, "zipcode", null);
+        addresses.forEach(System.out::println);
     }
 
     public void persistRelated() {
@@ -102,6 +133,23 @@ public class UserService {
         var address = user.getAddresses().getFirst();
         user.removeAddress(address);
         userRepository.save(user);
+    }
+
+    public void fetchProductsBySpecifications(String name, BigDecimal minPrice, BigDecimal maxPrice) {
+        Specification<Product> specification = null;
+        if (name != null && !name.isEmpty()) {
+            Specification<Product> nameSpec = ProductSpecification.hasName(name);
+        }
+        if (minPrice != null) {
+            Specification<Product> minPriceSpec = ProductSpecification.hasPriceGreaterThanOrEqualTo(minPrice);
+            specification = (specification == null) ? minPriceSpec : specification.and(minPriceSpec);
+        }
+        if (maxPrice != null) {
+            Specification<Product> maxPriceSpec = ProductSpecification.hasPriceLessThanOrEqualTo(maxPrice);
+            specification = (specification == null) ? maxPriceSpec : specification.and(maxPriceSpec);
+        }
+        var products = productRepository.findAll(specification);
+        products.forEach(System.out::println);
     }
 
     @Transactional
@@ -160,7 +208,7 @@ public class UserService {
         var usersProfiles = profileRepository.findLoyalProfiles(10);
         usersProfiles.forEach(userSummary ->
                 System.out.println(
-                                "{ id: " + userSummary.getId() +
+                        "{ id: " + userSummary.getId() +
                                 ", name: " + userSummary.getName() +
                                 ", email: " + userSummary.getEmail() + " }"));
     }
@@ -170,6 +218,28 @@ public class UserService {
         productRepository.updatePriceByCategory(BigDecimal.valueOf(10), (byte) 1);
     }
 
+    public void fetchSortedProducts() {
+//        var sort = Sort.by("name","price").descending();
+        var sort = Sort.by("name").and(
+                Sort.by("price").descending()
+        );
+
+        var products = productRepository.findAll(sort);
+        products.forEach(System.out::println);
+    }
+
+    public void fetchPaginatedProducts(int pageNumber, int pageSize) {
+        PageRequest pageRequest = PageRequest.of(pageNumber, pageSize);
+        Page<Product> page = productRepository.findAll(pageRequest);
+        var products = page.getContent();
+        products.forEach(System.out::println);
+
+        var totalPages = page.getTotalPages();
+        var totalElements = page.getTotalElements();
+        System.out.println("Total elements: " + totalElements);
+        System.out.println("Total pages: " + totalPages);
+    }
+
     public void fetchProducts() {
 //        var products = productRepository.findByCategory(new Category((byte) 1));
 //        products.forEach(System.out::println);
@@ -177,9 +247,50 @@ public class UserService {
 //        var products = productRepository.findByCategoryIdOrNameIgnoreCase((byte)1,"Product 1");
 //        System.out.println(products);
 
-        var products = productRepository.findByCategoryOrName(new Category((byte)1),"product 1");
-        products.forEach(System.out::println);
+//        var products = productRepository.findByCategoryOrName(new Category((byte)1),"product 1");
+//        products.forEach(System.out::println);
 
+        var product = new Product();
+        product.setName("product");
+
+        var matcher = ExampleMatcher.matching()
+//                .withIncludeNullValues()
+//                .withIgnoreNullValues()
+                .withIgnorePaths("id", "name")
+                .withStringMatcher(ExampleMatcher.StringMatcher.CONTAINING);
+        var example = Example.of(product, matcher);
+        var products = productRepository.findAll(example);
+        products.forEach(System.out::println);
+    }
+
+    public void fetchProductsByCriteria() {
+        var products = productRepository.findProductsByCriteria("prod", BigDecimal.valueOf(10), null);
+        products.forEach(System.out::println);
+    }
+
+    public void fetchProfilesByCriteria() {
+        var profiles = profileRepository.findProfilesByCriteria("bio", null, 10);
+        profiles.forEach(System.out::println);
+    }
+
+    public void fetchSortedUsers() {
+        var sort = Sort.by("name").and(
+                Sort.by("email").descending()
+        );
+        var users = userRepository.findAll(sort);
+        users.forEach(System.out::println);
+    }
+
+    public void fetchPaginatedUsers(int pageNumber, int pageSize) {
+        PageRequest pageRequest = PageRequest.of(pageNumber, pageSize);
+        Page<User> page = userRepository.findAll(pageRequest);
+        var users = page.getContent();
+        users.forEach(System.out::println);
+
+        var totalPages = page.getTotalPages();
+        var totalElements = page.getTotalElements();
+        System.out.println("Total elements: " + totalElements);
+        System.out.println("Total pages: " + totalPages);
     }
 
     @Transactional
@@ -188,14 +299,14 @@ public class UserService {
 //                .findByAddresses(new Address(5L))
 //                .forEach(System.out::println);
         var users = userRepository.findUsersWithAddresses();
-        users.forEach(user->{
+        users.forEach(user -> {
             System.out.println(user);
             System.out.println(user.getAddresses());
         });
     }
 
     @Transactional
-    public void callStoreProcedure(){
+    public void callStoreProcedure() {
         var products = productRepository.findProductByPrice(BigDecimal.valueOf(10), BigDecimal.valueOf(20));
         products.forEach(System.out::println);
     }

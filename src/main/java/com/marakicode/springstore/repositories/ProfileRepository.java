@@ -3,13 +3,15 @@ package com.marakicode.springstore.repositories;
 import com.marakicode.springstore.entities.Profile;
 import com.marakicode.springstore.projections.UserSummary;
 import org.springframework.data.jpa.repository.EntityGraph;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.repository.query.Param;
 
 import java.util.List;
 
-public interface ProfileRepository extends CrudRepository<Profile, Long> {
+public interface ProfileRepository extends JpaRepository<Profile, Long>, ProfileCriteriaRepository, JpaSpecificationExecutor<Profile> {
     @EntityGraph(attributePaths = "user")
     @Query("select p from Profile p where p.loyaltyPoints > :loyaltyPoints order by p.user.email")
     List<Profile> findByLoyaltyPointsGreaterThanOrderByUserEmail(@Param("loyaltyPoints") Integer loyaltyPoints);

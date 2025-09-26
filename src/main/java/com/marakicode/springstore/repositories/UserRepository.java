@@ -3,7 +3,11 @@ package com.marakicode.springstore.repositories;
 import com.marakicode.springstore.entities.Address;
 import com.marakicode.springstore.entities.User;
 import com.marakicode.springstore.projections.UserSummary;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.repository.EntityGraph;
+import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.repository.query.Param;
@@ -11,7 +15,7 @@ import org.springframework.data.repository.query.Param;
 import java.util.List;
 import java.util.Optional;
 
-public interface UserRepository extends CrudRepository<User, Long> {
+public interface UserRepository extends JpaRepository<User, Long> {
 //    String
     List<User> findByName(String name);
     List<User> findByNameLike(String name);
@@ -39,4 +43,10 @@ public interface UserRepository extends CrudRepository<User, Long> {
 
     @Query("select u.id as id, u.name as name,u.email as email from User u where u.profile.loyaltyPoints > :loyaltyPoints order by u.email")
     List<UserSummary> findLoyalUsers(@Param("loyaltyPoints") Integer loyaltyPoints);
+
+    @EntityGraph(attributePaths = "profile")
+    List<User> findAll(Sort sort);
+
+    @EntityGraph(attributePaths = "profile")
+    Page<User> findAll(Pageable pageable);
 }

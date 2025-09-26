@@ -9,6 +9,8 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.ApplicationContext;
 
+import java.math.BigDecimal;
+
 @SpringBootApplication
 public class SpringstoreApplication {
 
@@ -40,9 +42,18 @@ public class SpringstoreApplication {
 //        userService.manageProducts();
 //        userService.updatePrices();
 //        userService.fetchProducts();
+//        userService.fetchProductsByCriteria();
+//        userService.fetchProfilesByCriteria();
+//        userService.fetchProfilesBySpecifications("bio",10,20);
+//        userService.fetchSortedProducts();
+//        userService.fetchPaginatedProducts(0,3);
+//        userService.fetchSortedUsers();
+        userService.fetchPaginatedUsers(0,3);
 //        userService.callStoreProcedure();
+//        userService.fetchAddressByCriteria();
+//        userService.fetchProductsBySpecifications(null, BigDecimal.valueOf(1), BigDecimal.valueOf(10));
 //        userService.fetchUsers();
-        userService.manageUsers();
+//        userService.manageUsers();
 //        var categoryRepository = context.getBean(CategoryRepository.class);
 //        var category = Category.builder()
 //                .name("Category 1")
